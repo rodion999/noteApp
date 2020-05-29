@@ -26,6 +26,18 @@ export default {
   align-items: center;
   justify-content: center;
 }
+ul {
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li {
+  margin-bottom: 8px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
 .panel {
   margin: 10px;
   background-color: #fff;
@@ -101,9 +113,40 @@ export default {
   background-color: #21b9bb;
   border-color: #21b9bb;
 }
-@media only screen and (max-width : 480px) {
-    .d-flex{
-      flex-flow: column;
-    }
+.btn-icon {
+  background: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.edit:hover{
+  color:#23c6c8;
+}
+.trash:hover{
+  color:#ec4758;
+}
+.completed {
+  text-decoration: line-through;
+}
+.d-flex-li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-control {
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #e5e6e7;
+  border-radius: 1px;
+  color: inherit;
+  display: block;
+  padding: 6px 12px;
+  transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+  width: auto;
+}
+@media only screen and (max-width: 480px) {
+  .d-flex {
+    flex-flow: column;
+  }
 }
 </style>

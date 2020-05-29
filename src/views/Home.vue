@@ -11,20 +11,24 @@
         </div>
         <div class="panel-body">
           <ul>
-            <li v-for="(value,index) in note.Todo.slice(0,2)" :key="index">{{ value }}</li>
+            <li
+              v-for="(value,index) in note.Todos.slice(0,2)"
+              :key="index"
+              :class="value.completed == true ? 'completed' : '' "
+            >{{ value.description }}</li>
           </ul>
           <hr />
           <button class="btn btn-primary" @click="editNote(note.Id)">Редактировать</button>
           <button class="btn btn-danger" @click="showDeleteModal(note.Id)">Удалить</button>
         </div>
       </div>
-      <delete-note
-        :isShowDeleteModal="isShowDeleteModal"
-        :id="NoteId"
-        @close-modal="closeDeleteModal"
-        @delete-note="deleteNote"
-      ></delete-note>
     </div>
+    <delete-note
+      :isShowDeleteModal="isShowDeleteModal"
+      :id="NoteId"
+      @close-modal="closeDeleteModal"
+      @delete-note="deleteNote"
+    ></delete-note>
   </div>
 </template>
 <script>
@@ -34,7 +38,8 @@ import DeleteNote from "../components/DeleteNote.vue";
 export default {
   name: "Home",
   created() {
-    this.Notes = JSON.parse(localStorage.getItem("Notes"));
+    // this.Notes = JSON.parse(localStorage.getItem("Notes"));
+    this.Notes = this.$root.$data.Notes;
   },
   data() {
     return {
@@ -67,27 +72,16 @@ export default {
 
     deleteNote(id) {
       var res = _.remove(this.Notes, x => {
-        return x.Id != id;
+        return x.Id == id;
       });
-      this.Notes = res;
-      var serialObj = JSON.stringify(this.Notes);
-      localStorage.setItem("Notes", serialObj);
+      //this.Notes = res;
+      // var serialObj = JSON.stringify(this.Notes);
+      // localStorage.setItem("Notes", serialObj);
       this.isShowDeleteModal = false;
     }
   }
 };
 </script>
 <style scoped>
-ul {
-  text-align: left;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-li {
-  margin-bottom: 8px;
-}
-.mb-20 {
-  margin-bottom: 20px;
-}
+
 </style>

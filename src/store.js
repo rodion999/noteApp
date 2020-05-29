@@ -1,51 +1,7 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import App from './App.vue'
-import Home from './views/Home.vue'
-import Note from './components/Note.vue'
-import NotFound from './views/NotFound.vue'
-import data from './store.js'
+import _ from 'lodash';
 
-//For local storage key
-//const Notes = "Notes";
-Vue.use(Router)
-
-const router = new Router({
-  mode: 'history',
-  routes: [
-    {
-      path: '/',
-      name: 'Home',
-      component: Home,
-    },
-    {
-      path: '/Note/:id',
-      name: 'Note',
-      component: Note,
-      // props: true,
-    },
-    {
-      path: '*',
-      name: 'NotFound',
-      component: NotFound
-    }
-  ]
-})
-
-// if (!localStorage.getItem(Notes)) {
-//   localStorage.setItem(
-//     Notes, '{}');
-// }
-// recordLocalStorageObject();
-new Vue({
-  el: '#app',
-  render: h => h(App),
-  router,
-  data
-});
-
-function recordLocalStorageObject() {
-  var notesData = [
+export default {
+  Notes: [
     {
       Id: 1,
       Name: "Поход в магазин",
@@ -98,8 +54,11 @@ function recordLocalStorageObject() {
         { description: "CSS3", completed: false }
       ]
     }
-  ];
+  ],
 
-  var serialObj = JSON.stringify(notesData);
-  localStorage.setItem("Notes", serialObj);
-};
+  findById(id) {
+    var result = _.find(this.Notes, { "Id": id })
+    return result;
+  },
+}
+
