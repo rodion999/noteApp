@@ -1,23 +1,23 @@
 <template>
-  <transition name="modal" v-if="isShowDeleteModal == true">
+  <transition name="modal" v-if="isShowDeleteModal">
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container panel panel-danger">
-            <div class="panel-heading modal-header">
-              <slot name="header">Удалить заметку</slot>
-            </div>
-            <div class="panel-body modal-body">
-              <slot name="body">Вы действительно хотите удалить заметку ?</slot>
-            </div>
-            <div class="panel-footer modal-footer">
-              <slot name="footer">
-                <button class="btn btn-primary modal-default-button" @click="deleteNote(id)">Да</button>
-                <button class="btn btn-danger modal-default-button" @click="closeModal">Нет</button>
-              </slot>
-            </div>
+          <div class="panel-heading modal-header">
+            <slot name="header">Удалить заметку</slot>
+          </div>
+          <div class="panel-body modal-body">
+            <slot name="body">Вы действительно хотите удалить заметку ?</slot>
+          </div>
+          <div class="panel-footer modal-footer">
+            <slot name="footer">
+              <button class="btn btn-primary modal-default-button" @click="deleteNote(propId)">Да</button>
+              <button class="btn btn-danger modal-default-button" @click="hideModal(propId)">Нет</button>
+            </slot>
           </div>
         </div>
       </div>
+    </div>
   </transition>
 </template>
 
@@ -25,20 +25,42 @@
 export default {
   name: "DeleteNote",
   props: {
-    isShowDeleteModal: {
-      type: Boolean,
-      default: false
-    },
-    id: {
+    propId: {
       type: Number,
       default: 0
     }
   },
+  watch: {
+    propId: function() {
+      if (this.propId != 0)
+      this.showModal();
+    },
+  },
+  data() {
+    return {
+      isShowDeleteModal: false,
+    };
+  },
   methods: {
-    closeModal() {
-      this.$emit("close-modal");
+    showModal() {
+      if (!this.isShowDeleteModal) {
+        this.isShowDeleteModal = true;
+      } else {
+        this.isShowDeleteModal = false;
+      }
+    },
+    hideModal(id) {
+      this.isShowDeleteModal = false;
+      this.$emit("zeroing", 0)
     },
     deleteNote(id) {
+      var data = JSON.parse(localStorage.getItem("Notes"));
+      var res = _.remove(data, x => {
+        return x.Id == id;
+      });
+      var serialObj = JSON.stringify(data);
+      localStorage.setItem("Notes", serialObj);
+      this.isShowDeleteModal = false;
       this.$emit("delete-note", id);
     }
   }
@@ -46,12 +68,12 @@ export default {
 </script>
 <style scoped>
 .panel-danger {
-    border-color: #ed5565!important;
+  border-color: #ed5565 !important;
 }
 .panel-danger > .panel-heading {
-    background-color: #ed5565!important;
-    border-color: #ed5565!important;
-    color: #ffffff;
+  background-color: #ed5565 !important;
+  border-color: #ed5565 !important;
+  color: #ffffff;
 }
 .modal-mask {
   position: fixed;

@@ -23,24 +23,30 @@
           <hr />
           <div class="d-flex-li">
             <button class="btn btn-primary" @click="saveNote(UrlId)">Сохранить</button>
-            <button class="btn btn-danger" @click="showDeleteModal(UrlId)">Удалить</button>
+            <button class="btn btn-danger" @click="showModal(UrlId)">Удалить</button>
           </div>
         </div>
       </div>
     </div>
+    <delete-note :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId"></delete-note>
   </div>
 </template>
 <script>
 import Todo from "./Todo.vue";
 import CreateTodo from "./CreateTodo.vue";
+import DeleteNote from "../components/DeleteNote.vue";
 export default {
   name: "Note",
   components: {
     Todo,
-    CreateTodo
+    CreateTodo,
+    DeleteNote
   },
   mounted() {
-    this.Note = this.$root.$data.findById(this.UrlId);
+    var data = JSON.parse(localStorage.getItem(Notes));
+    this.Note = _.find(data, x => {
+      return x.Id == this.UrlId;
+    });
     if (!this.Note) {
       this.Note = {
         Id: null,
@@ -52,8 +58,8 @@ export default {
   data() {
     return {
       UrlId: this.$route.params.id,
-      todos: [],
       Note: {},
+      NoteId: 0
     };
   },
   methods: {
@@ -68,6 +74,25 @@ export default {
     },
     editTodo(todo, newTodoDescription) {
       todo.description = newTodoDescription;
+    },
+    showModal(id) {
+      this.NoteId = id;
+    },
+    deleteNote(id) {
+      this.$router.go(-1);
+    },
+    setNoteId() {
+      this.NoteId = 0;
+    },
+    saveNote(id) {
+      var data = JSON.parse(localStorage.getItem("Notes"));
+      var res = _.chain(data)
+        .find({ Id: id })
+        .merge({}, this.Note)
+        .value();
+      var serialObj = JSON.stringify(data);
+      localStorage.setItem("Notes", serialObj);
+      this.$router.go(-1);
     }
   }
 };
