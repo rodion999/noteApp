@@ -20,11 +20,11 @@
           </ul>
           <hr />
           <button class="btn btn-primary" @click="editNote(note.Id)">Редактировать</button>
-          <button class="btn btn-danger" @click="showModal(note.Id)">Удалить</button>
+          <button class="btn btn-danger" @click="showModal(Number(note.Id), 'delete')">Удалить</button>
         </div>
       </div>
     </div>
-    <modal :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId"></modal>
+    <modal :propId="NoteId" :propModalName="ModalName" @delete-note="deleteNote" @zeroing="setNoteId"></modal>
   </div>
 </template>
 <script>
@@ -43,7 +43,8 @@ export default {
   data() {
     return {
       NoteId: 0,
-      Notes: []
+      Notes: [],
+      ModalName: "",
     };
   },
   components: {
@@ -54,8 +55,9 @@ export default {
     editNote(el) {
       this.$router.push({ name: "Note", params: { id: el } });
     },
-    showModal(id) {
+    showModal(id, text) {
       this.NoteId = id;
+      this.ModalName = text;
     },
     deleteNote(id) {
       _.remove(this.Notes, x => {
