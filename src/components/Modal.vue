@@ -3,15 +3,26 @@
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container panel panel-danger">
-          <div class="panel-heading modal-header">
-            <slot name="header">Удалить заметку</slot>
+          <div v-if="propModalName == 'delete'">
+            <div class="panel-heading modal-header">
+              <slot name="header">Удалить заметку</slot>
+            </div>
+            <div class="panel-body modal-body">
+              <slot name="body">Вы действительно хотите удалить заметку ?</slot>
+            </div>
           </div>
-          <div class="panel-body modal-body">
-            <slot name="body">Вы действительно хотите удалить заметку ?</slot>
+          <div v-else>
+            <div class="panel-heading modal-header">
+              <slot name="header">Отменить изменения</slot>
+            </div>
+            <div class="panel-body modal-body">
+              <slot name="body">Вы действительно хотите отменить изменения ?</slot>
+            </div>
           </div>
           <div class="panel-footer modal-footer">
             <slot name="footer">
-              <button class="btn btn-primary modal-default-button" @click="deleteNote(propId)">Да</button>
+              <button class="btn btn-primary modal-default-button" v-if="propModalName == 'delete'" @click="deleteNote(propId)">Да</button>
+              <button class="btn btn-primary modal-default-button" v-else @click="cancelNote()">Да</button>
               <button class="btn btn-danger modal-default-button" @click="hideModal(propId)">Нет</button>
             </slot>
           </div>
@@ -23,22 +34,25 @@
 
 <script>
 export default {
-  name: "DeleteNote",
+  name: "Modal",
   props: {
     propId: {
       type: Number,
-      default: 0
+      default: 0,
+    },
+    propModalName: {
+      type: String,
+      default: ""
     }
   },
   watch: {
     propId: function() {
-      if (this.propId != 0)
-      this.showModal();
-    },
+      if (this.propId != 0) this.showModal();
+    }
   },
   data() {
     return {
-      isShowDeleteModal: false,
+      isShowDeleteModal: false
     };
   },
   methods: {
@@ -51,7 +65,7 @@ export default {
     },
     hideModal(id) {
       this.isShowDeleteModal = false;
-      this.$emit("zeroing", 0)
+      this.$emit("zeroing", 0);
     },
     deleteNote(id) {
       var data = JSON.parse(localStorage.getItem("Notes"));
@@ -61,7 +75,13 @@ export default {
       var serialObj = JSON.stringify(data);
       localStorage.setItem("Notes", serialObj);
       this.isShowDeleteModal = false;
+      this.$emit("zeroing", 0);
       this.$emit("delete-note", id);
+    },
+    cancelNote() {
+      this.isShowDeleteModal = false;
+      this.$emit("zeroing", 0);
+      this.$emit("cancel-note");
     }
   }
 };
@@ -70,7 +90,7 @@ export default {
 .panel-danger {
   border-color: #ed5565 !important;
 }
-.panel-danger > .panel-heading {
+.panel-danger div > .panel-heading {
   background-color: #ed5565 !important;
   border-color: #ed5565 !important;
   color: #ffffff;

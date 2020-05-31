@@ -24,12 +24,12 @@
         </div>
       </div>
     </div>
-    <delete-note :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId"></delete-note>
+    <modal :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId"></modal>
   </div>
 </template>
 <script>
 import Note from "../components/Note.vue";
-import DeleteNote from "../components/DeleteNote.vue";
+import Modal from "../components/Modal.vue";
 export default {
   name: "Home",
   created() {
@@ -47,7 +47,7 @@ export default {
     };
   },
   components: {
-    DeleteNote,
+    Modal,
     Note
   },
   methods: {
@@ -67,6 +67,7 @@ export default {
       this.NoteId = 0;
     },
     recordLocalStorageDemoData() {
+      localStorage.setItem("Notes", []);
       var demo = [
         {
           Id: 1,

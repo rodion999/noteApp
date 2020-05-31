@@ -4,14 +4,12 @@
     <h2 v-else>Редактирование заметки</h2>
     <div class="d-flex">
       <div class="panel">
-        <div class="panel-heading">
-          <span>{{Note.Name}}</span>
-        </div>
+        <edit-name :propName="NewNote.Name" @on-edit-name="editName(NewNote, $event)"></edit-name>
         <div class="panel-body">
           <create-todo @on-new-todo="addTodo($event)" />
           <ul>
             <todo
-              v-for="(todo, index) in Note.Todos"
+              v-for="(todo, index) in NewNote.Todos"
               :key="index"
               :description="todo.description"
               :completed="todo.completed"
@@ -23,24 +21,32 @@
           <hr />
           <div class="d-flex-li">
             <button class="btn btn-primary" @click="saveNote(UrlId)">Сохранить</button>
-            <button class="btn btn-danger" @click="showModal(UrlId)">Удалить</button>
+            <button class="btn btn-info m-10" @click="showModal(Number(UrlId), 'cancel')">Отменить</button>
+            <button
+              class="btn btn-danger"
+              @click="showModal(Number(UrlId), 'delete')"
+              v-show="UrlId != 0"
+            >Удалить</button>
           </div>
         </div>
       </div>
     </div>
-    <delete-note :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId"></delete-note>
+    <button class="btn btn-info" @click="back()">Назад</button>
+    <modal :propModalName="ModalName" :propId="NoteId" @delete-note="deleteNote" @zeroing="setNoteId" @cancel-note="cancelNote"></modal>
   </div>
 </template>
 <script>
 import Todo from "./Todo.vue";
 import CreateTodo from "./CreateTodo.vue";
-import DeleteNote from "../components/DeleteNote.vue";
+import Modal from "../components/Modal.vue";
+import EditName from "../components/EditName.vue";
 export default {
   name: "Note",
   components: {
     Todo,
     CreateTodo,
-    DeleteNote
+    Modal,
+    EditName
   },
   mounted() {
     var data = JSON.parse(localStorage.getItem(Notes));
@@ -54,44 +60,66 @@ export default {
         Todos: []
       };
     }
+    this.NewNote = _.cloneDeep(this.Note);
   },
   data() {
     return {
       UrlId: this.$route.params.id,
       Note: {},
-      NoteId: 0
+      NoteId: 0,
+      ModalName: "",
+      NewNote: {}
     };
   },
   methods: {
     addTodo(newTodo) {
-      this.Note.Todos.push({ description: newTodo, completed: false });
+      this.NewNote.Todos.push({ description: newTodo, completed: false });
     },
     toggleTodo(todo) {
       todo.completed = !todo.completed;
     },
     deleteTodo(deletedTodo) {
-      this.Note.Todos = this.Note.Todos.filter(todo => todo !== deletedTodo);
+      this.NewNote.Todos = this.NewNote.Todos.filter(
+        todo => todo !== deletedTodo
+      );
     },
     editTodo(todo, newTodoDescription) {
       todo.description = newTodoDescription;
     },
-    showModal(id) {
+    showModal(id, text) {
       this.NoteId = id;
+      this.ModalName = text;
     },
     deleteNote(id) {
       this.$router.go(-1);
     },
     setNoteId() {
       this.NoteId = 0;
+      this.ModalName = "";
     },
     saveNote(id) {
       var data = JSON.parse(localStorage.getItem("Notes"));
-      var res = _.chain(data)
-        .find({ Id: id })
-        .merge({}, this.Note)
-        .value();
+      if (id == 0) {
+        var newId = data.length + 1;
+        this.NewNote.Id = newId;
+        data.push(this.NewNote);
+      } else {
+        _.chain(data)
+          .find({ Id: id })
+          .merge({}, this.NewNote)
+          .value();
+      }
       var serialObj = JSON.stringify(data);
       localStorage.setItem("Notes", serialObj);
+      this.$router.go(-1);
+    },
+    editName(note, newName) {
+      this.NewNote.Name = newName;
+    },
+    cancelNote() {
+      this.NewNote = this.Note;
+    },
+    back() {
       this.$router.go(-1);
     }
   }
