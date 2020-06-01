@@ -21,7 +21,7 @@
           <hr />
           <div class="d-flex-li">
             <button class="btn btn-primary" @click="saveNote(UrlId)">Сохранить</button>
-            <button class="btn btn-info m-10" @click="showModal(Number(UrlId), 'cancel')">Отменить</button>
+            <button class="btn btn-info m-10" @click="showModal(Number(UrlId), 'cancel')" v-show="UrlId !=0">Отменить</button>
             <button
               class="btn btn-danger"
               @click="showModal(Number(UrlId), 'delete')"
